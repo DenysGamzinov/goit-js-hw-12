@@ -1,28 +1,5 @@
-
-// import { refs } from "./refs";
-// import { pixabayApi } from "./pixabay-api";
-// import { checkFunction } from "./render-functions";
-// import iziToast from "izitoast";
-// import "izitoast/dist/css/iziToast.min.css";
-
-
-// export function onFormSubmit(event) {
-//     event.preventDefault();
-//     refs.loadMore.classList.add("is-hidden");
-//     refs.gallery.innerHTML = "";
-//     const userText = refs.input.value.trim();
-//     if (userText !== "") {
-//         pixabayApi(userText,1).then(checkFunction);
-//     } else {
-//         iziToast.error({
-//             message: "Sorry, the search bar is empty. Please try again!",
-//             position: "topLeft",
-//         });
-//     };
-// }
-
-import { refs } from './refs';
-import { getImagesByQuery } from './pixabay-api';
+import { refs } from "./refs";
+import { getImagesByQuery } from "./pixabay-api";
 import {
     createGallery,
     clearGallery,
@@ -31,7 +8,7 @@ import {
     showLoadMoreButton,
     hideLoadMoreButton,
     showEndOfResultsToast,
-} from './render-functions';
+} from "./render-functions";
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
@@ -39,42 +16,6 @@ let currentPage = 1;
 let currentSearchQuery = '';
 let totalAvailablePages = 0;
 const IMAGES_PER_PAGE = 15;
-
-refs.loadMore.addEventListener('click', async () => {
-    currentPage += 1;
-
-    hideLoadMoreButton();
-    showLoader();
-
-    try {
-        const data = await getImagesByQuery(currentSearchQuery, currentPage);
-        createGallery(data.hits);
-
-        const galleryItemHeight = refs.gallery.firstElementChild.getBoundingClientRect().height;
-        window.scrollBy({
-            behavior: 'smooth',
-            top: galleryItemHeight * 2,
-        });
-
-        if (currentPage === totalAvailablePages) {
-            showEndOfResultsToast();
-            hideLoadMoreButton();
-        } else {
-            showLoadMoreButton();
-        }
-
-    } catch (error) {
-        console.error('Error loading additional images:', error);
-        iziToast.error({
-            message: 'Sorry, there was an error loading more images. Please try again later.',
-            position: 'topRight',
-        });
-        hideLoadMoreButton();
-    } finally {
-        hideLoader();
-    }
-});
-
 
 export async function onFormSubmit(event) {
     event.preventDefault();
@@ -125,3 +66,38 @@ export async function onFormSubmit(event) {
         hideLoader();
     }
 }
+
+refs.loadMore.addEventListener('click', async () => {
+    currentPage += 1;
+
+    hideLoadMoreButton();
+    showLoader();
+
+    try {
+        const data = await getImagesByQuery(currentSearchQuery, currentPage);
+        createGallery(data.hits);
+
+        const galleryItemHeight = refs.gallery.firstElementChild.getBoundingClientRect().height;
+        window.scrollBy({
+            behavior: 'smooth',
+            top: galleryItemHeight * 2,
+        });
+
+        if (currentPage === totalAvailablePages) {
+            showEndOfResultsToast();
+            hideLoadMoreButton();
+        } else {
+            showLoadMoreButton();
+        }
+
+    } catch (error) {
+        console.error('Error loading additional images:', error);
+        iziToast.error({
+            message: 'Sorry, there was an error loading more images. Please try again later.',
+            position: 'topRight',
+        });
+        hideLoadMoreButton();
+    } finally {
+        hideLoader();
+    }
+});
